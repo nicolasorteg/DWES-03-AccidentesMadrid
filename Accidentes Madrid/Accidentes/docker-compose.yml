@@ -1,0 +1,8 @@
+﻿services:
+  accidentes-madrid:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data
+    container_name: accidentes-madrid
