@@ -3,5 +3,5 @@
 namespace Accidentes.Service;
 
 public interface IAccidenteService {
-    IReadOnlyList<ResultadoConsulta> EjecutarConsultas(IEnumerable<Accidente> datos);
+    IEnumerable<ResultadoConsulta> EjecutarConsultas(IEnumerable<Accidente> datos);
 }

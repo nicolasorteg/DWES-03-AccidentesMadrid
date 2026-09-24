@@ -3,9 +3,9 @@ using Accidentes.Models;
 
 namespace Accidentes.Service;
 
-public sealed class AccidentesLinqService : IAccidenteService
-{
-    public IReadOnlyList<ResultadoConsulta> EjecutarConsultas(IEnumerable<Accidente> datos) {
+public sealed class AccidentesLinqService : IAccidenteService {
+
+    public IEnumerable<ResultadoConsulta> EjecutarConsultas(IEnumerable<Accidente> datos) {
         
         var lista = datos.ToList();
         var resultados = new List<ResultadoConsulta>();
@@ -44,8 +44,7 @@ public sealed class AccidentesLinqService : IAccidenteService
         });
 
         // accidentes por estado meteorológico 
-        Medir(4, "Accidentes por estado meteorológico", () =>
-        {
+        Medir(4, "Accidentes por estado meteorológico", () => {
             var porEstado = lista
                 .GroupBy(a => string.IsNullOrWhiteSpace(a.EstadoMeteorologico) ? "(sin dato)" : a.EstadoMeteorologico)
                 .OrderByDescending(g => g.Count())
@@ -53,9 +52,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", porEstado);
         });
 
-        // --- 5. Accidentes por sexo ---
-        Medir(5, "Accidentes por sexo", () =>
-        {
+        // accidentes por sexo
+        Medir(5, "Accidentes por sexo", () => {
             var porSexo = lista
                 .GroupBy(a => a.Sexo)
                 .OrderByDescending(g => g.Count())
@@ -63,9 +61,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", porSexo);
         });
 
-        // --- 6. Accidentes por rango de edad ---
-        Medir(6, "Accidentes por rango de edad", () =>
-        {
+        // accidentes por rango de edad 
+        Medir(6, "Accidentes por rango de edad", () => {
             var porEdad = lista
                 .GroupBy(a => a.RangoEdad)
                 .OrderByDescending(g => g.Count())
@@ -73,17 +70,16 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", porEdad);
         });
 
-        // --- 7. Positivos en alcohol ---
+        // positivos en alcohol
         Medir(7, "Positivos en alcohol", () =>
             lista.Count(a => a.PositivaAlcohol).ToString("N0"));
 
-        // --- 8. Positivos en drogas ---
+        // positivos en drogas
         Medir(8, "Positivos en drogas", () =>
             lista.Count(a => a.PositivaDroga).ToString("N0"));
 
-        // --- 9. Accidentes por día de la semana ---
-        Medir(9, "Accidentes por día de la semana", () =>
-        {
+        // accidentes por día de la semana
+        Medir(9, "Accidentes por día de la semana", () => {
             var porDia = lista
                 .GroupBy(a => a.Fecha.DayOfWeek)
                 .OrderByDescending(g => g.Count())
@@ -91,9 +87,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", porDia);
         });
 
-        // --- 10. Accidentes por mes ---
-        Medir(10, "Accidentes por mes", () =>
-        {
+        // accidentes por mes
+        Medir(10, "Accidentes por mes", () => {
             var porMes = lista
                 .GroupBy(a => a.Fecha.Month)
                 .OrderBy(g => g.Key)
@@ -101,9 +96,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", porMes);
         });
 
-        // --- 11. Hora con más accidentes ---
-        Medir(11, "Hora con más accidentes", () =>
-        {
+        // hora con más accidentes 
+        Medir(11, "Hora con más accidentes", () => {
             var top = lista
                 .GroupBy(a => a.Hora.Hour)
                 .OrderByDescending(g => g.Count())
@@ -111,9 +105,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return $"{top.Key:00}:00 ({top.Count()} accidentes)";
         });
 
-        // --- 12. Lesiones más frecuentes ---
-        Medir(12, "Lesiones más frecuentes", () =>
-        {
+        // lesiones más frecuentes
+        Medir(12, "Lesiones más frecuentes", () => {
             var porLesion = lista
                 .GroupBy(a => a.CodLesividad?.ToString() ?? "(sin asistencia / sin dato)")
                 .OrderByDescending(g => g.Count())
@@ -121,9 +114,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", porLesion);
         });
 
-        // --- 13. Tipo de vehículo más implicado ---
-        Medir(13, "Tipo de vehículo más implicado", () =>
-        {
+        // tipo de vehículo más implicado
+        Medir(13, "Tipo de vehículo más implicado", () => {
             var top = lista
                 .Where(a => !string.IsNullOrWhiteSpace(a.TipoVehiculo))
                 .GroupBy(a => a.TipoVehiculo)
@@ -132,13 +124,12 @@ public sealed class AccidentesLinqService : IAccidenteService
             return $"{top.Key} ({top.Count()})";
         });
 
-        // --- 14. Accidentes con peatones ---
+        // accidentes con peatones 
         Medir(14, "Accidentes con peatones", () =>
             lista.Count(EsPeaton).ToString("N0"));
 
-        // --- 15. Proporción hombre/mujer ---
-        Medir(15, "Proporción hombre/mujer", () =>
-        {
+        // proporción hombre/mujer 
+        Medir(15, "Proporción hombre/mujer", () => {
             var hombres = lista.Count(a => a.Sexo == Enums.Sexo.Hombre);
             var mujeres = lista.Count(a => a.Sexo == Enums.Sexo.Mujer);
             var total = hombres + mujeres;
@@ -147,9 +138,8 @@ public sealed class AccidentesLinqService : IAccidenteService
                 : $"Hombres: {hombres} ({hombres * 100.0 / total:F2}%), Mujeres: {mujeres} ({mujeres * 100.0 / total:F2}%)";
         });
 
-        // --- 16. Distritos con más peatones ---
-        Medir(16, "Distritos con más peatones", () =>
-        {
+        // distritos con más peatones
+        Medir(16, "Distritos con más peatones", () => {
             var top5 = lista
                 .Where(EsPeaton)
                 .GroupBy(a => a.Distrito)
@@ -159,28 +149,24 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", top5);
         });
 
-        // --- 17. Fin de semana vs entre semana ---
-        Medir(17, "Fin de semana vs entre semana", () =>
-        {
+        // fin de semana vs entre semana
+        Medir(17, "Fin de semana vs entre semana", () => {
             var fds = lista.Count(EsFinDeSemana);
             return $"Fin de semana: {fds} | Entre semana: {lista.Count - fds}";
         });
 
-        // --- 18. Media de accidentes por día ---
-        Medir(18, "Media de accidentes por día", () =>
-        {
+        // media de accidentes por día
+        Medir(18, "Media de accidentes por día", () => {
             var diasConDatos = lista.Select(a => a.Fecha).Distinct().Count();
             var media = diasConDatos == 0 ? 0 : lista.Count / (double)diasConDatos;
             return $"{media:F2} registros/día ({diasConDatos} días distintos)";
         });
 
-        // --- 19. Accidentes con alcohol + droga ---
-        Medir(19, "Accidentes con alcohol + droga", () =>
-            lista.Count(a => a.PositivaAlcohol && a.PositivaDroga).ToString("N0"));
+        // accidentes con alcohol + droga
+        Medir(19, "Accidentes con alcohol + droga", () => lista.Count(a => a.PositivaAlcohol && a.PositivaDroga).ToString("N0"));
 
-        // --- 20. Rangos de edad más vulnerables (peatones) ---
-        Medir(20, "Rangos de edad más vulnerables (peatones)", () =>
-        {
+        // rangos de edad más vulnerables (peatones)
+        Medir(20, "Rangos de edad más vulnerables (peatones)", () => {
             var top5 = lista
                 .Where(EsPeaton)
                 .GroupBy(a => a.RangoEdad)
@@ -190,9 +176,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", top5);
         });
 
-        // --- 21. Distritos con más positivos en alcohol ---
-        Medir(21, "Distritos con más positivos en alcohol", () =>
-        {
+        // distritos con más positivos en alcohol 
+        Medir(21, "Distritos con más positivos en alcohol", () => {
             var top5 = lista
                 .Where(a => a.PositivaAlcohol)
                 .GroupBy(a => a.Distrito)
@@ -202,9 +187,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", top5);
         });
 
-        // --- 22. Accidentes por código de distrito ---
-        Medir(22, "Accidentes por código de distrito", () =>
-        {
+        // accidentes por código de distrito
+        Medir(22, "Accidentes por código de distrito", () => {
             var porCodigo = lista
                 .GroupBy(a => a.CodDistrito)
                 .OrderBy(g => g.Key)
@@ -212,9 +196,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", porCodigo);
         });
 
-        // --- 23. Accidentes por año ---
-        Medir(23, "Accidentes por año", () =>
-        {
+        // accidentes por año
+        Medir(23, "Accidentes por año", () => {
             var porAnio = lista
                 .GroupBy(a => a.Fecha.Year)
                 .OrderBy(g => g.Key)
@@ -222,9 +205,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", porAnio);
         });
 
-        // --- 24. Evolución mensual por año ---
-        Medir(24, "Evolución mensual por año", () =>
-        {
+        // evolución mensual por año
+        Medir(24, "Evolución mensual por año", () => {
             var evolucion = lista
                 .GroupBy(a => (a.Fecha.Year, a.Fecha.Month))
                 .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
@@ -232,17 +214,12 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", evolucion);
         });
 
-        // --- 25. Distrito con más accidentes por año (PLINQ) ---
-        // Justificación de PLINQ aquí: por cada año hay que hacer un GroupBy anidado
-        // (agrupar por distrito DENTRO de cada grupo de año), lo que multiplica el
-        // coste. Los años son independientes entre sí (igual que las 4 cadenas del
-        // desayuno), así que particionar el trabajo por año es un buen candidato.
-        Medir(25, "Distrito con más accidentes por año (PLINQ)", () =>
-        {
+        // distrito con más accidentes por año
+        // plinq pq agrupar por distrito en cada año es muy costoso
+        Medir(25, "Distrito con más accidentes por año (PLINQ)", () => {
             var porAnio = lista.AsParallel()
                 .GroupBy(a => a.Fecha.Year)
-                .Select(g => new
-                {
+                .Select(g => new {
                     Anio = g.Key,
                     Top = g.GroupBy(a => a.Distrito).OrderByDescending(x => x.Count()).First()
                 })
@@ -251,9 +228,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", porAnio);
         });
 
-        // --- 26. Tendencia de alcohol por año ---
-        Medir(26, "Tendencia de alcohol por año", () =>
-        {
+        // tendencia de alcohol por año
+        Medir(26, "Tendencia de alcohol por año", () => {
             var tendencia = lista
                 .Where(a => a.PositivaAlcohol)
                 .GroupBy(a => a.Fecha.Year)
@@ -262,9 +238,8 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", tendencia);
         });
 
-        // --- 27. Comparativa fin de semana vs entre semana por año ---
-        Medir(27, "Fin de semana vs entre semana por año", () =>
-        {
+        // comparativa fin de semana vs entre semana por año
+        Medir(27, "Fin de semana vs entre semana por año", () => {
             var comparativa = lista
                 .GroupBy(a => a.Fecha.Year)
                 .OrderBy(g => g.Key)
@@ -272,9 +247,9 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", comparativa);
         });
 
-        // --- 28. Hora pico por año (PLINQ, mismo motivo que la 25) ---
-        Medir(28, "Hora pico por año (PLINQ)", () =>
-        {
+        // hora pico por año
+        // plinq por igual que la 25
+        Medir(28, "Hora pico por año (PLINQ)", () => {
             var porAnio = lista.AsParallel()
                 .GroupBy(a => a.Fecha.Year)
                 .Select(g => new
@@ -287,25 +262,22 @@ public sealed class AccidentesLinqService : IAccidenteService
             return string.Join(", ", porAnio);
         });
 
-        // --- 29. Lesión más frecuente por año (PLINQ, mismo motivo) ---
-        Medir(29, "Lesión más frecuente por año (PLINQ)", () =>
-        {
+        // lesión más frecuente por año, plinq por mismo motivo
+        Medir(29, "Lesión más frecuente por año (PLINQ)", () => {
             var porAnio = lista.AsParallel()
                 .GroupBy(a => a.Fecha.Year)
-                .Select(g => new
-                {
+                .Select(g => new {
                     Anio = g.Key,
                     Top = g.GroupBy(a => a.CodLesividad?.ToString() ?? "(sin dato)")
-                           .OrderByDescending(x => x.Count()).First()
+                        .OrderByDescending(x => x.Count()).First()
                 })
                 .OrderBy(x => x.Anio)
                 .Select(x => $"{x.Anio}: {x.Top.Key} ({x.Top.Count()})");
             return string.Join(", ", porAnio);
         });
 
-        // --- 30. Evolución de peatones por año ---
-        Medir(30, "Evolución de peatones por año", () =>
-        {
+        // evolución de peatones por año
+        Medir(30, "Evolución de peatones por año", () => {
             var evolucion = lista
                 .Where(EsPeaton)
                 .GroupBy(a => a.Fecha.Year)
