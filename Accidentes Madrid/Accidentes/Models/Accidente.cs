@@ -29,7 +29,7 @@ public record Accidente {
 
     public TipoAccidente CodigoAccidente { get; init; }
 
-    public Lesividad CodLesividad { get; init; }
+    public Lesividad? CodLesividad { get; init; }
 
     public double CoordenadaXUtm { get; init; }
     public double CoordenadaYUtm { get; init; }
