@@ -44,7 +44,7 @@ public class AccidenteRepository : IAccidenteRepository {
         return csv.GetRecords<Accidente>().ToList();
     }
     
-    public string ResolverDirectorioDatos() {
+    private static string ResolverDirectorioDatos() {
         var directorio = Directory.GetCurrentDirectory();
 
         while (directorio != null) {
@@ -55,6 +55,6 @@ public class AccidenteRepository : IAccidenteRepository {
             directorio = Directory.GetParent(directorio)?.FullName;
         }
 
-        throw new DirectoryNotFoundException("No se encontró el directorio data/ con los ficheros CSV.");
+        throw new DirectoryNotFoundException("No se encontró data/ con los CSV.");
     }
 }
